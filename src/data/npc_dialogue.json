@@ -1,0 +1,25 @@
+{
+    "generic": {
+        "greeting": [
+            "Hello there!",
+            "Greetings, traveler!",
+            "Welcome to our humble abode.",
+            "Ah, a new face! What brings you here?",
+            "Good day! How can I assist you?"
+        ],
+        "farewell": [
+            "Farewell, friend!",
+            "Safe travels!",
+            "Until we meet again.",
+            "Take care!",
+            "Goodbye for now."
+        ],
+        "no_interaction": [
+            "I have nothing to say to you.",
+            "I'm not in the mood for conversation.",
+            "Please leave me be.",
+            "I don't want to talk right now.",
+            "I'm busy, can't you see?"
+        ]
+    }
+}
