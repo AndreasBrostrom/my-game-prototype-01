@@ -2,6 +2,8 @@ import pygame
 import math
 from agents import NPC
 from agents import size_human
+from world import Chunk
+from world import world_generation
 
 # pygame setup
 pygame.init()
@@ -12,53 +14,81 @@ running = True
 dt = 0
 
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+sprint_timer = 0
+sprint_cooldown = 0
 
-font = pygame.font.Font(None, 36)  # Font for the text
+font = pygame.font.Font(None, 36)
 
-# Initialize NPCs
-npcs = [
-    NPC((player_pos.x + 100, player_pos.y), 80, ["generic","no_interaction"]),
-    NPC((player_pos.x - 100, player_pos.y), 80, ["generic","no_interaction"]),
-    NPC((player_pos.x, player_pos.y + 100), 80, ["generic","no_interaction"]),
-]
 
-def handle_controls(player_pos, dt, npcs):
-    """Handles player movement based on keyboard input and checks for collisions."""
+# Load world
+chunks = world_generation()
+
+
+def handle_controls(player_pos, dt, chunks):
+    """Handles player movement, sprinting, and collision detection."""
+    global sprint_timer, sprint_cooldown
     keys = pygame.key.get_pressed()
     new_pos = player_pos.copy()
 
+    # Sprint logic
+    current_time = pygame.time.get_ticks() / 1000  # Get current time in seconds
+    sprint_speed = 200  # Default movement speed
+    if keys[pygame.K_LSHIFT] and current_time - sprint_cooldown >= 3:  # Sprint cooldown is 3 seconds
+        if sprint_timer < 3:  # Sprint duration is 3 seconds
+            sprint_speed = 400  # Increased speed during sprint
+            sprint_timer += dt
+        else:
+            sprint_cooldown = current_time  # Start cooldown after sprint ends
+            sprint_timer = 0  # Reset sprint timer
+
     # Movement logic
     if keys[pygame.K_w] or keys[pygame.K_UP]:
-        new_pos.y -= 200 * dt
+        new_pos.y -= sprint_speed * dt
     if keys[pygame.K_s] or keys[pygame.K_DOWN]:
-        new_pos.y += 200 * dt
+        new_pos.y += sprint_speed * dt
     if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-        new_pos.x -= 200 * dt
+        new_pos.x -= sprint_speed * dt
     if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-        new_pos.x += 200 * dt
+        new_pos.x += sprint_speed * dt
 
-    # Collision detection with NPCs
-    for npc in npcs:
-        distance = math.hypot(new_pos.x - npc.position.x, new_pos.y - npc.position.y)
-        if distance < npc.size + 8:  # If the player is too close to the NPC
-            return player_pos  # Block movement by returning the original position
+    # Handle collisions
+    new_pos = handle_collisions(player_pos, new_pos, chunks)
 
     return new_pos
 
-def world(player_pos, events, dt, camera_offset):
+
+def handle_collisions(player_pos, new_pos, chunks):
+    """Handle collisions with NPCs and tiles in chunks."""
+
+    for chunk in chunks:
+        for tile in chunk.tiles:
+            if not tile.walkable:
+                tile_rect = pygame.Rect(tile.position[0], tile.position[1], tile.size[0], tile.size[1])
+                player_rect = pygame.Rect(new_pos.x - 6, new_pos.y - 6, size_human, size_human)
+                if player_rect.colliderect(tile_rect):
+                    return player_pos  # Block movement by returning the original position
+
+    return new_pos  # No collision, allow movement
+
+
+def render(player_pos, events, dt, camera_offset):
     """Handles the logic for level 1 with a static level and camera movement."""
 
     # Fill the screen with the level background
     screen.fill("purple")
 
+    # Draw all chunks (tiles and NPCs)
+    for chunk in chunks:
+        chunk.draw(screen, camera_offset)
+
     # Adjust player position based on the camera offset
     player_screen_pos = player_pos - camera_offset
 
     # Draw the player
-    pygame.draw.circle(screen, "red", (int(player_screen_pos.x), int(player_screen_pos.y)), size_human)
+    pygame.draw.circle(screen, "red", (int(player_screen_pos.x), int(player_screen_pos.y)), 12)
 
     # Handle player movement and collision detection
-    new_pos = handle_controls(player_pos, dt, npcs)
+    new_pos = handle_controls(player_pos, dt, chunks)
     player_pos = new_pos  # Update position
 
     # Camera movement logic
@@ -75,12 +105,7 @@ def world(player_pos, events, dt, camera_offset):
     elif player_screen_pos.y > center_y + free_zone // 2:
         camera_offset.y += player_screen_pos.y - (center_y + free_zone // 2)
 
-    # Draw and handle interactions for all NPCs
-    for npc in npcs:
-        npc.draw(screen, camera_offset)  # Ensure NPCs are drawn
-        npc.handle_interaction(player_pos, events, screen, font, camera_offset)
-
-    return player_pos, camera_offset  # Return the updated player position and camera offset
+    return player_pos, camera_offset
 
 
 # Main game loop
@@ -93,7 +118,7 @@ while running:
             running = False
 
     # Call level_1 and update the player position and camera offset
-    player_pos, camera_offset = world(player_pos, events, dt, camera_offset)
+    player_pos, camera_offset = render(player_pos, events, dt, camera_offset)
 
     # Flip the display to put your work on screen
     pygame.display.flip()
