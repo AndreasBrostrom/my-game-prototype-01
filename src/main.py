@@ -1,8 +1,5 @@
 import pygame
-import math
-from agents import NPC
 from agents import size_human
-from world import Chunk
 from world import world_generation
 
 # pygame setup
@@ -80,6 +77,7 @@ def render(player_pos, events, dt, camera_offset):
     # Draw all chunks (tiles and NPCs)
     for chunk in chunks:
         chunk.draw(screen, camera_offset)
+        chunk.draw_debug_info(screen, camera_offset, font)
 
     # Adjust player position based on the camera offset
     player_screen_pos = player_pos - camera_offset
@@ -104,6 +102,11 @@ def render(player_pos, events, dt, camera_offset):
         camera_offset.y -= center_y - free_zone // 2 - player_screen_pos.y
     elif player_screen_pos.y > center_y + free_zone // 2:
         camera_offset.y += player_screen_pos.y - (center_y + free_zone // 2)
+
+    # Handle interactions with NPCs
+    for chunk in chunks:
+        for npc in chunk.npcs:
+            npc.handle_interaction(player_pos, events, screen, font, camera_offset)
 
     return player_pos, camera_offset
 
