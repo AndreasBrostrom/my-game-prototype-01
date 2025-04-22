@@ -2,8 +2,8 @@ import pygame
 import os
 import json
 from agents import NPC
+from main import rootFolder
 
-rootFolder = os.path.dirname(os.path.realpath(__file__))
 chunk_size = (10, 10)  # Each chunk is 10x10 tiles
 tile_size = (50, 50)  # Each tile is 50x50 pixels
 

@@ -4,9 +4,8 @@ import os
 import math
 import time
 import random
+from main import rootFolder
 
-
-rootFolder = os.path.dirname(os.path.realpath(__file__))
 with open(os.path.join(rootFolder, "data", "npc_dialogue.json"), "r") as file:
     dialogue_table = json.load(file)
 

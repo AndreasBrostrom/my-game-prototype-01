@@ -1,6 +1,5 @@
 import pygame
 import os
-import sys
 import argparse
 from agents import size_human
 from world import world_generation
