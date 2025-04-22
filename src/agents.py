@@ -5,7 +5,9 @@ import math
 import time
 import random
 
-with open(os.path.join("src", "data", "npc_dialogue.json"), "r") as file:
+
+rootFolder = os.path.dirname(os.path.realpath(__file__))
+with open(os.path.join(rootFolder, "data", "npc_dialogue.json"), "r") as file:
     dialogue_table = json.load(file)
 
 # Human Size

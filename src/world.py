@@ -3,13 +3,13 @@ import os
 import json
 from agents import NPC
 
-
+rootFolder = os.path.dirname(os.path.realpath(__file__))
 chunk_size = (10, 10)  # Each chunk is 10x10 tiles
 tile_size = (50, 50)  # Each tile is 50x50 pixels
 
 
 def world_generation():
-    with open(os.path.join("src", "data", "world_chunk.json"), "r") as file:
+    with open(os.path.join(rootFolder, "data", "world_chunk.json"), "r") as file:
         world_chunks_data = json.load(file)
 
     chunks = []

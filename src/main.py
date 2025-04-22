@@ -1,7 +1,12 @@
 import pygame
+import os
+import sys
 import argparse
 from agents import size_human
 from world import world_generation
+
+
+rootFolder = os.path.dirname(os.path.realpath(__file__))
 
 parser = argparse.ArgumentParser(description="Adventure Game")
 parser.add_argument('--debug', action='store_true')
@@ -15,7 +20,6 @@ screen = pygame.display.set_mode((1920, 1080))
 clock = pygame.time.Clock()
 
 # GLOBAL: Game variables sprint
-running = True
 sprint_timer = 0
 sprint_cooldown = 0
 
@@ -115,6 +119,7 @@ def render(player_pos, events, dt, camera_offset):
     return player_pos, camera_offset
 
 def main():
+    running = True
     dt = 0
     player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
