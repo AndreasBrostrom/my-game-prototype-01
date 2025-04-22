@@ -1,15 +1,15 @@
 import pygame
 import os
 import json
-from agents import NPC
-from main import rootFolder
+from agents import AGENT
 
 chunk_size = (10, 10)  # Each chunk is 10x10 tiles
 tile_size = (50, 50)  # Each tile is 50x50 pixels
 
+root = os.path.dirname(os.path.abspath(__file__))
 
 def world_generation():
-    with open(os.path.join(rootFolder, "data", "world_chunk.json"), "r") as file:
+    with open(os.path.join(root, "data", "world_chunk.json"), "r") as file:
         world_chunks_data = json.load(file)
 
     chunks = []
@@ -18,15 +18,17 @@ def world_generation():
             chunk_data["position"][0] * 500,  # Convert chunk coordinates to world coordinates
             chunk_data["position"][1] * 500,
         )
+        chunk_roomIdentifier = chunk_data["roomIdentifier"] if "roomIdentifier" in chunk_data else ""
         tile_map = chunk_data["tile"]
-        npcs_data = chunk_data.get("npc", [])  # Get NPC data for this chunk
-        chunks.append(Chunk(chunk_position, chunk_size, tile_size, tile_map, npcs_data))
+        npcs_data = chunk_data.get("agents", [])  # Get NPC data for this chunk
+        chunks.append(Chunk(chunk_position, chunk_size, chunk_roomIdentifier, tile_size, tile_map, npcs_data))
     return chunks
 
 class Chunk:
-    def __init__(self, position, chunk_size, tile_size, tile_map, npcs_data):
+    def __init__(self, position, chunk_size, chunk_roomIdentifier, tile_size, tile_map, npcs_data):
         self.position = position  # (x, y) position of the chunk in world space
         self.chunk_size = chunk_size  # (width, height) in tiles
+        self.chunk_roomIdentifier = chunk_roomIdentifier  # (width, height) of each tile
         self.tile_size = tile_size  # (width, height) of each tile
         self.tiles = []  # List to store tiles in this chunk
         self.npcs = []  # List to store NPCs in this chunk
@@ -58,8 +60,9 @@ class Chunk:
             )
 
             name = npc_data["name"] if "name" in npc_data else "Unknown"
+            profession = npc_data["profession"] if "profession" in npc_data else "none"
             detection = npc_data["detection"] if "detection" in npc_data else 60
-            self.npcs.append(NPC(npc_position, detection, name, npc_data["dialogue"]))
+            self.npcs.append(AGENT(npc_position, detection, name, profession, npc_data["dialogue"]))
 
     def draw(self, screen, camera_offset):
         """Draw all tiles and NPCs in this chunk."""
@@ -86,6 +89,9 @@ class Chunk:
         # Draw chunk coordinates
         text_surface = font.render(f"X: {self.position[0] // 500}, Y: {self.position[1] // 500}", True, (255, 255, 255))
         screen.blit(text_surface, (chunk_screen_pos[0] + 10, chunk_screen_pos[1] + 10))
+
+        text_surface = font.render(f"{self.chunk_roomIdentifier}", True, (255, 255, 255))
+        screen.blit(text_surface, (chunk_screen_pos[0] + 10, chunk_screen_pos[1] + 35))
 
         # Draw grid lines around the chunk
         chunk_width = self.chunk_size[0] * self.tile_size[0]

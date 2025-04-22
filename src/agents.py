@@ -4,19 +4,20 @@ import os
 import math
 import time
 import random
-from main import rootFolder
 
-with open(os.path.join(rootFolder, "data", "npc_dialogue.json"), "r") as file:
+root = os.path.dirname(os.path.realpath(__file__))
+with open(os.path.join(root, "data", "npc_dialogue.json"), "r") as file:
     dialogue_table = json.load(file)
 
-# Human Size
+# Agent global
 size_human = 12
 
-class NPC:
-    def __init__(self, position, detection, name: str, dialogue: str | bool):
+class AGENT:
+    def __init__(self, position, detection, name: str, profession: str, dialogue: str | bool):
         self.position = pygame.Vector2(position)
         self.detection = detection
         self.name = name
+        self.profession = profession
         self.dialogue = dialogue
         self.text_visible = False
         self.text_timer = 0
@@ -26,7 +27,14 @@ class NPC:
     def draw(self, screen, camera_offset):
         """Draw the NPC on the screen."""
         screen_pos = self.position - camera_offset
-        pygame.draw.circle(screen, "green", (int(screen_pos.x), int(screen_pos.y)), self.size)
+
+        color = "green"
+        if self.profession == "shopkeeper":
+            color = "blue"
+        if self.profession == "beggar":
+            color = pygame.Color(255, 255, 255, 255)
+
+        pygame.draw.circle(screen, color, (int(screen_pos.x), int(screen_pos.y)), self.size)
         return screen_pos
 
     def handle_interaction(self, player_pos, events, screen, font, camera_offset):
@@ -58,13 +66,14 @@ class NPC:
 
     def _trigger_dialogue(self):
         """Trigger dialogue display."""
-
         if dialogue_table and "generic" in dialogue_table:
             if self.dialogue:
-                if self.dialogue == "shopkeeper":
-                    if "greeting" in dialogue_table["generic"]:
-                        dialogue_text = random.choice(dialogue_table["generic"]["greeting"])
-                        self.current_dialogue = f"{self.name}: {dialogue_text}"
+                try:
+                    dialogue_text = random.choice(dialogue_table["generic"][self.dialogue])
+                    self.current_dialogue = f"{self.name}: {dialogue_text}"
+                except KeyError:
+                    print(f"Error: Dialogue not found for {self.dialogue}")
+                    self.current_dialogue = f"{self.name}: ..."
             else:
                 if "no_interaction" in dialogue_table["generic"]:
                     dialogue_text = random.choice(dialogue_table["generic"]["no_interaction"])

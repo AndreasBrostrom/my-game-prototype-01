@@ -1,22 +1,22 @@
 import pygame
 import os
 import argparse
-from agents import size_human
 from world import world_generation
+from agents import size_human
 
-
-rootFolder = os.path.dirname(os.path.realpath(__file__))
+root = os.path.dirname(os.path.realpath(__file__))
 
 parser = argparse.ArgumentParser(description="Adventure Game")
 parser.add_argument('--debug', action='store_true')
 args = parser.parse_args()
-
 
 # pygame setup
 pygame.init()
 pygame.display.set_caption("Adventure Game")
 screen = pygame.display.set_mode((1920, 1080))
 clock = pygame.time.Clock()
+
+# GLOBAL: Human Size
 
 # GLOBAL: Game variables sprint
 sprint_timer = 0
@@ -78,7 +78,7 @@ def render(player_pos, events, dt, camera_offset):
     """Handles the logic for level 1 with a static level and camera movement."""
 
     # Fill the screen with the level background
-    screen.fill("purple")
+    screen.fill("black")
 
     # Draw all chunks (tiles and NPCs)
     for chunk in chunks:
@@ -120,7 +120,8 @@ def render(player_pos, events, dt, camera_offset):
 def main():
     running = True
     dt = 0
-    player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+    #player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+    player_pos = pygame.Vector2(-250, -125)
 
     # Main game loop
     camera_offset = pygame.Vector2(0, 0)  # Initial camera offset
