@@ -1,25 +1,28 @@
 import pygame
+import argparse
 from agents import size_human
 from world import world_generation
 
+parser = argparse.ArgumentParser(description="Adventure Game")
+parser.add_argument('--debug', action='store_true')
+args = parser.parse_args()
+
+
 # pygame setup
 pygame.init()
-screen = pygame.display.set_mode((1920, 1080))
 pygame.display.set_caption("Adventure Game")
+screen = pygame.display.set_mode((1920, 1080))
 clock = pygame.time.Clock()
-running = True
-dt = 0
 
-player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+# GLOBAL: Game variables sprint
+running = True
 sprint_timer = 0
 sprint_cooldown = 0
 
 font = pygame.font.Font(None, 36)
 
-
 # Load world
 chunks = world_generation()
-
 
 def handle_controls(player_pos, dt, chunks):
     """Handles player movement, sprinting, and collision detection."""
@@ -77,7 +80,8 @@ def render(player_pos, events, dt, camera_offset):
     # Draw all chunks (tiles and NPCs)
     for chunk in chunks:
         chunk.draw(screen, camera_offset)
-        chunk.draw_debug_info(screen, camera_offset, font)
+        if args.debug:
+            chunk.draw_debug_info(screen, camera_offset, font)
 
     # Adjust player position based on the camera offset
     player_screen_pos = player_pos - camera_offset
@@ -110,28 +114,34 @@ def render(player_pos, events, dt, camera_offset):
 
     return player_pos, camera_offset
 
+def main():
+    dt = 0
+    player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
-# Main game loop
-camera_offset = pygame.Vector2(0, 0)  # Initial camera offset
-while running:
-    # Poll for events
-    events = pygame.event.get()
-    for event in events:
-        if event.type == pygame.QUIT:
+    # Main game loop
+    camera_offset = pygame.Vector2(0, 0)  # Initial camera offset
+    while running:
+        # Poll for events
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.QUIT:
+                running = False
+
+        # Call level_1 and update the player position and camera offset
+        player_pos, camera_offset = render(player_pos, events, dt, camera_offset)
+
+        # Flip the display to put your work on screen
+        pygame.display.flip()
+
+        # Limit FPS to 60
+        dt = clock.tick(60) / 1000
+
+        # Quit the game if Q is pressed
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_q]:
             running = False
 
-    # Call level_1 and update the player position and camera offset
-    player_pos, camera_offset = render(player_pos, events, dt, camera_offset)
+    pygame.quit()
 
-    # Flip the display to put your work on screen
-    pygame.display.flip()
-
-    # Limit FPS to 60
-    dt = clock.tick(60) / 1000
-
-    # Quit the game if Q is pressed
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_q]:
-        running = False
-
-pygame.quit()
+if __name__ == "__main__":
+    main()
