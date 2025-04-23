@@ -241,22 +241,6 @@
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    ],
-    "npc": [
-      {
-        "name": "Unknown",
-        "tile": [8, 5],
-        "tile_offset": [25, 0],
-        "dialogue": false,
-        "detection": 60
-      },
-      {
-        "name": "Unknown",
-        "tile": [8, 5],
-        "tile_offset": [30, 40],
-        "dialogue": false,
-        "detection": 60
-      }
     ]
   },
   {
@@ -272,22 +256,6 @@
       [1, 1, 0, 0, 1, 0, 0, 0, 0, 1],
       [1, 1, 0, 0, 1, 0, 0, 0, 0, 1],
       [1, 1, 0, 0, 0, 0, 0, 0, 0, 1]
-    ],
-    "npc": [
-      {
-        "name": "Unknown",
-        "tile": [3, 0],
-        "tile_offset": [25, 30],
-        "dialogue": false,
-        "detection": 60
-      },
-      {
-        "name": "Unknown",
-        "tile": [3, 1],
-        "tile_offset": [25, 25],
-        "dialogue": false,
-        "detection": 60
-      }
     ]
   },
   {
