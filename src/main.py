@@ -2,6 +2,7 @@ import pygame
 import os
 import argparse
 from world import world_generation
+from world import get_visible_chunks
 from agents import size_human
 
 root = os.path.dirname(os.path.realpath(__file__))
@@ -81,10 +82,16 @@ def render(player_pos, events, dt, camera_offset):
     screen.fill("black")
 
     # Draw all chunks (tiles and NPCs)
-    for chunk in chunks:
+
+    """Render only the visible chunks and their contents."""
+    visible_chunks = get_visible_chunks(player_pos, chunks)
+
+    for chunk in visible_chunks:
         chunk.draw(screen, camera_offset)
+        chunk.draw_debug_info(screen, camera_offset, font)
         if args.debug:
             chunk.draw_debug_info(screen, camera_offset, font)
+
 
     # Adjust player position based on the camera offset
     player_screen_pos = player_pos - camera_offset

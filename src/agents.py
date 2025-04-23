@@ -6,7 +6,7 @@ import time
 import random
 
 root = os.path.dirname(os.path.realpath(__file__))
-with open(os.path.join(root, "data", "npc_dialogue.json"), "r") as file:
+with open(os.path.join(root, "data", "dialogue.json"), "r") as file:
     dialogue_table = json.load(file)
 
 # Agent global

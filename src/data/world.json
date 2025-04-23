@@ -13,44 +13,6 @@
       [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [1, 2, 2, 0, 2, 2, 0, 0, 0, 0],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    ],
-    "agents": [
-      {
-        "name": "Shopkeeper",
-        "type": "human",
-        "profession": "shopkeeper",
-        "tile": [2, 1],
-        "tile_offset": [12, 30],
-        "dialogue": "shopkeeper",
-        "detection": 60
-      },
-      {
-        "name": "Shopkeeper",
-        "type": "human",
-        "profession": "shopkeeper",
-        "tile": [2, 4],
-        "tile_offset": [12, 25],
-        "dialogue": "shopkeeper",
-        "detection": 60
-      },
-      {
-        "name": "Shopkeeper",
-        "type": "human",
-        "profession": "shopkeeper",
-        "tile": [5, 5],
-        "tile_offset": [18, 40],
-        "dialogue": "shopkeeper",
-        "detection": 60
-      },
-      {
-        "name": "Shopkeeper",
-        "type": "human",
-        "profession": "shopkeeper",
-        "tile": [9, 4],
-        "tile_offset": [20, 20],
-        "dialogue": "shopkeeper",
-        "detection": 60
-      }
     ]
   },
   {
@@ -67,44 +29,6 @@
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    ],
-    "agents": [
-      {
-        "name": "Shopkeeper",
-        "type": "human",
-        "profession": "shopkeeper",
-        "tile": [4, 3],
-        "tile_offset": [30, 40],
-        "dialogue": "shopkeeper",
-        "detection": 60
-      },
-      {
-        "name": "Unknown",
-        "type": "human",
-        "profession": "none",
-        "tile": [2, 4],
-        "tile_offset": [12, 25],
-        "dialogue": false,
-        "detection": 60
-      },
-      {
-        "name": "Unknown",
-        "type": "human",
-        "profession": "none",
-        "tile": [2, 4],
-        "tile_offset": [22, 50],
-        "dialogue": false,
-        "detection": 60
-      },
-      {
-        "name": "Beggar",
-        "type": "human",
-        "profession": "beggar",
-        "tile": [7, 7],
-        "tile_offset": [30, 40],
-        "dialogue": "beggar",
-        "detection": 60
-      }
     ]
   },
   {
