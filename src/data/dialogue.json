@@ -1,21 +1,33 @@
 {
-    "generic": {
-        "no_interaction": [
-            "I have nothing to say to you.",
-            "I'm not in the mood for conversation.",
-            "Please leave me be.",
-            "I don't want to talk right now.",
-            "I'm busy, can't you see?"
-        ],
-        "shopkeeper": [
-            "Hello there!",
-            "Welcome to my shop!",
-            "What can I do for you today?",
-            "Good day! How can I assist you?"
-        ],
-        "beggar": [
-            "Please spare a change...",
-            "I have nothing sir, do you have some work?..."
-        ]
+  "generic": {
+    "no_interaction": [
+      "I have nothing to say to you.",
+      "I'm not in the mood for conversation.",
+      "Please leave me be.",
+      "I don't want to talk right now.",
+      "I'm busy, can't you see?"
+    ],
+    "shopkeeper": [
+      "Hello there!",
+      "Welcome to my shop!",
+      "What can I do for you today?",
+      "Good day! How can I assist you?"
+    ],
+    "beggar": [
+      "Please spare a change...",
+      "I have nothing sir, do you have some work?..."
+    ]
+  },
+  "beggar": {
+    "dialogue": [
+      "Please spare a change...",
+      "I have nothing sir, do you have some change?..."
+    ],
+    "1": {
+      "display": "1. I have nothing to give you."
+    },
+    "2": {
+      "display": "2. I have nothing to give you."
     }
+  }
 }

@@ -88,7 +88,6 @@ def render(player_pos, events, dt, camera_offset):
 
     for chunk in visible_chunks:
         chunk.draw(screen, camera_offset)
-        chunk.draw_debug_info(screen, camera_offset, font)
         if args.debug:
             chunk.draw_debug_info(screen, camera_offset, font)
 
@@ -128,7 +127,7 @@ def main():
     running = True
     dt = 0
     #player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
-    player_pos = pygame.Vector2(-250, -125)
+    player_pos = pygame.Vector2(445, 325)
 
     # Main game loop
     camera_offset = pygame.Vector2(0, 0)  # Initial camera offset
