@@ -92,8 +92,8 @@ def render(player_pos, events, dt, camera_offset):
             chunk.draw_debug_info(screen, camera_offset, font)
 
         # Handle interactions with NPCs in the chunk
-        for npc in chunk.npcs:
-            npc.handle_interaction(player_pos, events, screen, font, camera_offset)
+        for agent in chunk.agents:
+            agent.handle_interaction(player_pos, events, screen, font, camera_offset)
 
     # Adjust player position based on the camera offset
     player_screen_pos = player_pos - camera_offset

@@ -49,7 +49,6 @@ def draw_ui(screen):
 
     return buttons
 
-
 def handle_ui_events(events, buttons):
     """Handle UI button clicks."""
     for event in events:

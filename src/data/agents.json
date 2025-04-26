@@ -6,6 +6,7 @@
     "chunk_position": [0, 0],
     "tile": [2, 1],
     "tile_offset": [12, 30],
+    "allowDialogue": false,
     "dialogue": "shopkeeper",
     "detection": 60
   },
@@ -16,6 +17,7 @@
     "chunk_position": [0, 0],
     "tile": [2, 4],
     "tile_offset": [12, 25],
+    "allowDialogue": false,
     "dialogue": "shopkeeper",
     "detection": 60
   },
@@ -26,6 +28,7 @@
     "chunk_position": [0, 0],
     "tile": [5, 5],
     "tile_offset": [18, 40],
+    "allowDialogue": false,
     "dialogue": "shopkeeper",
     "detection": 60
   },
@@ -36,6 +39,7 @@
     "chunk_position": [0, 0],
     "tile": [9, 4],
     "tile_offset": [20, 20],
+    "allowDialogue": false,
     "dialogue": "shopkeeper",
     "detection": 60
   },
@@ -47,6 +51,7 @@
     "chunk_position": [1, 0],
     "tile": [4, 3],
     "tile_offset": [30, 40],
+    "allowDialogue": false,
     "dialogue": "shopkeeper",
     "detection": 60
   },
@@ -57,7 +62,7 @@
     "chunk_position": [1, 0],
     "tile": [2, 4],
     "tile_offset": [12, 25],
-    "dialogue": false,
+    "allowDialogue": false,
     "detection": 60
   },
   {
@@ -67,7 +72,7 @@
     "chunk_position": [1, 0],
     "tile": [2, 4],
     "tile_offset": [22, 50],
-    "dialogue": false,
+    "allowDialogue": false,
     "detection": 60
   },
   {
@@ -77,6 +82,7 @@
     "chunk_position": [1, 0],
     "tile": [7, 7],
     "tile_offset": [30, 40],
+    "allowDialogue": true,
     "dialogue": "beggar",
     "detection": 60
   }
