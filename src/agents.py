@@ -40,7 +40,7 @@ class AGENT:
         pygame.draw.circle(screen, color, (int(screen_pos.x), int(screen_pos.y)), self.size)
         return screen_pos
 
-    def handle_interaction(self, player_pos, events, screen, font, camera_offset):
+    def handle_interaction(self, player_pos, events, screen, font, camera_offset, game_state):
         """Handle interaction with the player."""
         player_screen_pos = player_pos - camera_offset
         screen_pos = self.position - camera_offset
@@ -53,14 +53,16 @@ class AGENT:
                     mouse_pos = pygame.mouse.get_pos()
                     mouse_distance = math.hypot(mouse_pos[0] - screen_pos.x, mouse_pos[1] - screen_pos.y)
                     if mouse_distance <= self.detection:
-                        self._trigger_dialogue()
+                        self._trigger_dialogue(game_state)
 
         if self.text_visible:
             draw_dialogue_box(screen, font, self.current_dialogue, self.dialogue_options, self.selected_option)
-            handle_dialogue_input(events, self)
+            handle_dialogue_input(events, self, game_state)
             
-    def _trigger_dialogue(self):
+    def _trigger_dialogue(self, game_state):
         """Trigger dialogue display."""
+        game_state.dialogue_active = True
+
         if self.allow_dialogue:
             # Open interactive dialogue
             if dialogue_table and self.dialogue in dialogue_table:
@@ -97,6 +99,7 @@ class AGENT:
         self.text_visible = True
         self.text_timer = time.time()
 
+
 # handle interaction and dialogues        
 def draw_dialogue_box(screen, font, dialogue_text, options, selected_option):
     """Draw the dialogue box with text and selectable options."""
@@ -119,9 +122,12 @@ def draw_dialogue_box(screen, font, dialogue_text, options, selected_option):
         option_surface = font.render(option["text"], True, color)
         screen.blit(option_surface, (70, option_y))
         option_y += 30
-        
-def handle_dialogue_input(events, agent):
+
+
+def handle_dialogue_input(events, agent, game_state):
     """Handle input for navigating and selecting dialogue options."""
+    global dialogue_active
+
     for event in events:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
@@ -129,5 +135,11 @@ def handle_dialogue_input(events, agent):
             elif event.key == pygame.K_DOWN:
                 agent.selected_option = (agent.selected_option + 1) % len(agent.dialogue_options)
             elif event.key == pygame.K_RETURN:
-                selected_option = agent.dialogue_options[agent.selected_option]
-                agent.text_visible = False  # Close dialogue after selection
+                try:
+                    selected_option = agent.dialogue_options[agent.selected_option]
+                    print(f"Selected option: {selected_option['text']}, Effect: {selected_option['effect']}")
+                    agent.text_visible = False
+                    game_state.dialogue_active = False
+                except:
+                    agent.text_visible = False
+                    game_state.dialogue_active = False

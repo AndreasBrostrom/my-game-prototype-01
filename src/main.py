@@ -6,6 +6,7 @@ from world import get_visible_chunks
 from agents import size_human
 from ui import draw_ui
 from ui import handle_ui_events
+from game_state import GameState
 
 root = os.path.dirname(os.path.realpath(__file__))
 
@@ -19,9 +20,9 @@ pygame.display.set_caption("Adventure Game")
 screen = pygame.display.set_mode((1920, 1080))
 clock = pygame.time.Clock()
 
-# GLOBAL: Human Size
+# Global
+dialogue_active = False
 
-# GLOBAL: Game variables sprint
 sprint_timer = 0
 sprint_cooldown = 0
 
@@ -29,10 +30,14 @@ font = pygame.font.Font(None, 36)
 
 # Load world
 chunks = world_generation()
-
-def handle_controls(player_pos, dt, chunks):
+def handle_controls(player_pos, dt, chunks, game_state):
     """Handles player movement, sprinting, and collision detection."""
     global sprint_timer, sprint_cooldown
+
+    # Prevent movement if a dialogue is active
+    if game_state.dialogue_active:
+        return player_pos
+
     keys = pygame.key.get_pressed()
     new_pos = player_pos.copy()
 
@@ -62,7 +67,6 @@ def handle_controls(player_pos, dt, chunks):
 
     return new_pos
 
-
 def handle_collisions(player_pos, new_pos, chunks):
     """Handle collisions with NPCs and tiles in chunks."""
 
@@ -76,8 +80,7 @@ def handle_collisions(player_pos, new_pos, chunks):
 
     return new_pos  # No collision, allow movement
 
-
-def render(player_pos, events, dt, camera_offset):
+def render(player_pos, events, dt, camera_offset, game_state):
     """Handles the logic for level 1 with a static level and camera movement."""
 
     # Fill the screen with the level background
@@ -93,7 +96,7 @@ def render(player_pos, events, dt, camera_offset):
 
         # Handle interactions with NPCs in the chunk
         for agent in chunk.agents:
-            agent.handle_interaction(player_pos, events, screen, font, camera_offset)
+            agent.handle_interaction(player_pos, events, screen, font, camera_offset, game_state)
 
     # Adjust player position based on the camera offset
     player_screen_pos = player_pos - camera_offset
@@ -102,7 +105,7 @@ def render(player_pos, events, dt, camera_offset):
     pygame.draw.circle(screen, "red", (int(player_screen_pos.x), int(player_screen_pos.y)), 12)
 
     # Handle player movement and collision detection
-    new_pos = handle_controls(player_pos, dt, chunks)
+    new_pos = handle_controls(player_pos, dt, chunks, game_state)
     player_pos = new_pos  # Update position
 
     # Camera movement logic
@@ -122,6 +125,7 @@ def render(player_pos, events, dt, camera_offset):
     return player_pos, camera_offset
 
 def main():
+    game_state = GameState()  # Initialize shared game state
     running = True
     dt = 0
     #player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
@@ -137,7 +141,7 @@ def main():
                 running = False
 
         # Call render and update the player position and camera offset
-        player_pos, camera_offset = render(player_pos, events, dt, camera_offset)
+        player_pos, camera_offset = render(player_pos, events, dt, camera_offset, game_state)
 
         # Draw and handle UI
         buttons = draw_ui(screen)
