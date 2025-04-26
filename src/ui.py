@@ -9,7 +9,6 @@ def open_map():
 def open_settings():
     print("Opening settings...")
 
-
 def draw_ui(screen):
     """Draw the UI, including the lower bar and buttons."""
     # Lower bar dimensions

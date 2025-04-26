@@ -50,7 +50,7 @@ def get_visible_chunks(player_position, chunks):
     return visible_chunks
 
 class Chunk:
-    def __init__(self, chunk_position, chunk_size, chunk_roomIdentifier, tile_size, tile_map, agent):
+    def __init__(self, chunk_position, chunk_size, chunk_roomIdentifier, tile_size, tile_map, agents_data):
         self.chunk_position = chunk_position  # (x, y) position of the chunk in world space
         self.chunk_size = chunk_size  # (width, height) in tiles
         self.chunk_roomIdentifier = chunk_roomIdentifier  # (width, height) of each tile
@@ -73,21 +73,22 @@ class Chunk:
                     self.tiles.append(Tile(tile_position, tile_size, "furniture", walkable=False))
 
         # Load NPCs from the JSON data
-        for agent in agent:
+        for agent in agents_data:
             agent_tile_position = (
                 chunk_position[0] + agent["tile"][0] * tile_size[0],
                 chunk_position[1] + agent["tile"][1] * tile_size[1],
             )
-            # Apply the tile_offset
             agent_position = (
                 agent_tile_position[0] + agent["tile_offset"][0],
                 agent_tile_position[1] + agent["tile_offset"][1],
             )
+            detection = agent["detection"]
+            name = agent.get("name", "Unknown")
+            profession = agent.get("profession", "none")
+            dialogue = agent.get("dialogue", False)
+            allow_dialogue = agent.get("allowDialogue", False)
 
-            name = agent["name"] if "name" in agent else "Unknown"
-            profession = agent["profession"] if "profession" in agent else "none"
-            detection = agent["detection"] if "detection" in agent else 60
-            self.agents.append(AGENT(agent_position, detection, name, profession, agent["dialogue"]))
+            self.agents.append(AGENT(agent_position, detection, name, profession, dialogue, allow_dialogue))
 
     def draw(self, screen, camera_offset):
         """Draw all tiles and NPCs in this chunk."""
