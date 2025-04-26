@@ -21,12 +21,12 @@
     ],
     "options": [
       {
-        "option": "1. Here you go (Give 1 bullet).",
+        "option": "Here you go (Give 1 bullet).",
         "effect": "give_bullet_1",
         "dialogue": "Thank you, kind stranger!"
       },
       {
-        "option": "2. I have nothing to give you.",
+        "option": "I have nothing to give you.",
         "dialogue": [
           "I understand, times are tough.",
           "I appreciate your honesty."

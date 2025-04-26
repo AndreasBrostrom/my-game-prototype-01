@@ -7,6 +7,7 @@ from agents import size_human
 from ui import draw_ui
 from ui import handle_ui_events
 from game_state import GameState
+from agents import draw_dialogue_box
 
 root = os.path.dirname(os.path.realpath(__file__))
 
@@ -122,6 +123,16 @@ def render(player_pos, events, dt, camera_offset, game_state):
     elif player_screen_pos.y > center_y + free_zone // 2:
         camera_offset.y += player_screen_pos.y - (center_y + free_zone // 2)
 
+    # Draw the UI
+    buttons = draw_ui(screen)
+    handle_ui_events(events, buttons)
+
+    # Draw the dialogue box last to ensure it is on top
+    for chunk in visible_chunks:
+        for agent in chunk.agents:
+            if agent.text_visible:
+                draw_dialogue_box(screen, font, agent.current_dialogue, agent.dialogue_options, agent.selected_option)
+
     return player_pos, camera_offset
 
 def main():
@@ -143,9 +154,6 @@ def main():
         # Call render and update the player position and camera offset
         player_pos, camera_offset = render(player_pos, events, dt, camera_offset, game_state)
 
-        # Draw and handle UI
-        buttons = draw_ui(screen)
-        handle_ui_events(events, buttons)
 
         # Flip the display to put your work on screen
         pygame.display.flip()

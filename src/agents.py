@@ -49,14 +49,14 @@ class AGENT:
 
         if distance <= self.detection:
             for event in events:
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    mouse_distance = math.hypot(mouse_pos[0] - screen_pos.x, mouse_pos[1] - screen_pos.y)
-                    if mouse_distance <= self.detection:
-                        self._trigger_dialogue(game_state)
+                if not game_state.dialogue_active:
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mouse_pos = pygame.mouse.get_pos()
+                        mouse_distance = math.hypot(mouse_pos[0] - screen_pos.x, mouse_pos[1] - screen_pos.y)
+                        if mouse_distance <= self.detection:
+                            self._trigger_dialogue(game_state)
 
         if self.text_visible:
-            draw_dialogue_box(screen, font, self.current_dialogue, self.dialogue_options, self.selected_option)
             handle_dialogue_input(events, self, game_state)
             
     def _trigger_dialogue(self, game_state):
@@ -67,10 +67,15 @@ class AGENT:
             # Open interactive dialogue
             if dialogue_table and self.dialogue in dialogue_table:
                 dialogue_data = dialogue_table[self.dialogue]
-                if isinstance(dialogue_data, list):
-                    self.current_dialogue = random.choice(dialogue_data)
-                elif isinstance(dialogue_data, dict):
-                    self.current_dialogue = dialogue_data.get("dialogue", "...")
+                if isinstance(dialogue_data, dict):
+                    # If dialogue_data is a dictionary, handle dialogue and options
+                    dialogue = dialogue_data.get("dialogue", "...")
+                    if isinstance(dialogue, list):
+                        # If "dialogue" is a list, pick a random entry
+                        self.current_dialogue = random.choice(dialogue)
+                    else:
+                        # Otherwise, use the string directly
+                        self.current_dialogue = dialogue
                     self.dialogue_options = [
                         {"text": option["option"], "effect": option.get("effect", None)}
                         for option in dialogue_data.get("options", [])
@@ -86,15 +91,15 @@ class AGENT:
             if dialogue_table and "generic" in dialogue_table:
                 if self.dialogue in dialogue_table["generic"]:
                     self.current_dialogue = random.choice(dialogue_table["generic"][self.dialogue])
+
                 else:
                     self.current_dialogue = random.choice(dialogue_table["generic"]["no_interaction"])
             else:
                 self.current_dialogue = f"{self.name}: ..."
-            self.dialogue_options = []
-
-        # Ensure current_dialogue is a string
-        if not isinstance(self.current_dialogue, str):
-            self.current_dialogue = str(self.current_dialogue)
+            default_response = random.choice(["Ok...", "I see...", "Never mined...", "..."])
+            self.dialogue_options = [
+                {"text": default_response, "effect": None}
+            ]
 
         self.text_visible = True
         self.text_timer = time.time()
@@ -106,20 +111,25 @@ def draw_dialogue_box(screen, font, dialogue_text, options, selected_option):
 
     screen_width, screen_height = screen.get_size()
 
-    # Draw dialogue box background
-    dialogue_box_height = 150
-    pygame.draw.rect(screen, (50, 50, 50), (50, screen_height - dialogue_box_height - 50, screen_width - 100, dialogue_box_height))
-    pygame.draw.rect(screen, (255, 255, 255), (50, screen_height - dialogue_box_height - 50, screen_width - 100, dialogue_box_height), 2)
+    # Adjust the dialogue box position
+    dialogue_box_height = 160
+    dialogue_box_y = screen_height - dialogue_box_height - 150  # Move the box higher by 150 pixels
 
-    # Render dialogue text
+    # Draw dialogue box background
+    pygame.draw.rect(screen, (50, 50, 50), (50, dialogue_box_y, screen_width - 100, dialogue_box_height))
+    pygame.draw.rect(screen, (255, 255, 255), (50, dialogue_box_y, screen_width - 100, dialogue_box_height), 2)
+
+    
+    # Render dialogue text    
     text_surface = font.render(dialogue_text, True, (255, 255, 255))
-    screen.blit(text_surface, (70, screen_height - dialogue_box_height - 30))
+    screen.blit(text_surface, (70, dialogue_box_y + 10))
 
     # Draw response options
-    option_y = screen_height - dialogue_box_height + 10
+    option_y = dialogue_box_y + 50
     for i, option in enumerate(options):
         color = (255, 255, 0) if i == selected_option else (255, 255, 255)
-        option_surface = font.render(option["text"], True, color)
+        optionText = f"{i+1}. {option['text']}"
+        option_surface = font.render(optionText, True, color)
         screen.blit(option_surface, (70, option_y))
         option_y += 30
 
@@ -136,8 +146,9 @@ def handle_dialogue_input(events, agent, game_state):
                 agent.selected_option = (agent.selected_option + 1) % len(agent.dialogue_options)
             elif event.key == pygame.K_RETURN:
                 try:
+                    print(agent.selected_option)
                     selected_option = agent.dialogue_options[agent.selected_option]
-                    print(f"Selected option: {selected_option['text']}, Effect: {selected_option['effect']}")
+                    print(f"Selected option: '{selected_option['text']}', Effect: {selected_option['effect']}")
                     agent.text_visible = False
                     game_state.dialogue_active = False
                 except:
