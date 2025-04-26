@@ -4,6 +4,8 @@ import argparse
 from world import world_generation
 from world import get_visible_chunks
 from agents import size_human
+from ui import draw_ui
+from ui import handle_ui_events
 
 root = os.path.dirname(os.path.realpath(__file__))
 
@@ -81,9 +83,7 @@ def render(player_pos, events, dt, camera_offset):
     # Fill the screen with the level background
     screen.fill("black")
 
-    # Draw all chunks (tiles and NPCs)
-
-    """Render only the visible chunks and their contents."""
+    # Render only the visible chunks and their contents
     visible_chunks = get_visible_chunks(player_pos, chunks)
 
     for chunk in visible_chunks:
@@ -91,6 +91,9 @@ def render(player_pos, events, dt, camera_offset):
         if args.debug:
             chunk.draw_debug_info(screen, camera_offset, font)
 
+        # Handle interactions with NPCs in the chunk
+        for npc in chunk.npcs:
+            npc.handle_interaction(player_pos, events, screen, font, camera_offset)
 
     # Adjust player position based on the camera offset
     player_screen_pos = player_pos - camera_offset
@@ -116,11 +119,6 @@ def render(player_pos, events, dt, camera_offset):
     elif player_screen_pos.y > center_y + free_zone // 2:
         camera_offset.y += player_screen_pos.y - (center_y + free_zone // 2)
 
-    # Handle interactions with NPCs
-    for chunk in chunks:
-        for npc in chunk.npcs:
-            npc.handle_interaction(player_pos, events, screen, font, camera_offset)
-
     return player_pos, camera_offset
 
 def main():
@@ -138,8 +136,12 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-        # Call level_1 and update the player position and camera offset
+        # Call render and update the player position and camera offset
         player_pos, camera_offset = render(player_pos, events, dt, camera_offset)
+
+        # Draw and handle UI
+        buttons = draw_ui(screen)
+        handle_ui_events(events, buttons)
 
         # Flip the display to put your work on screen
         pygame.display.flip()
