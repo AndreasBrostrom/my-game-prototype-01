@@ -62,3 +62,45 @@ def handle_ui_events(events, buttons):
                         open_map()
                     elif button["label"] == "Settings":
                         open_settings()
+
+def open_store_ui(screen, items, selected_item_index):
+    """Draw the store UI with a list of items."""
+    screen_width, screen_height = screen.get_size()
+
+    # Store UI dimensions
+    store_width = 400
+    store_height = 300
+    store_x = (screen_width - store_width) // 2
+    store_y = (screen_height - store_height) // 2
+
+    # Draw store background
+    pygame.draw.rect(screen, (30, 30, 30), (store_x, store_y, store_width, store_height))
+    pygame.draw.rect(screen, (255, 255, 255), (store_x, store_y, store_width, store_height), 2)
+
+    # Title
+    font = pygame.font.Font(None, 36)
+    title_surface = font.render("Store", True, (255, 255, 255))
+    screen.blit(title_surface, (store_x + 20, store_y + 20))
+
+    # Draw items
+    item_font = pygame.font.Font(None, 28)
+    item_y = store_y + 60
+    for i, item in enumerate(items):
+        color = (255, 255, 0) if i == selected_item_index else (255, 255, 255)
+        item_surface = item_font.render(f"{i + 1}. {item}", True, color)
+        screen.blit(item_surface, (store_x + 20, item_y))
+        item_y += 30
+
+def handle_store_input(events, items, selected_item_index, inventory):
+    """Handle input for navigating and selecting items in the store."""
+    for event in events:
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                selected_item_index = (selected_item_index - 1) % len(items)
+            elif event.key == pygame.K_DOWN:
+                selected_item_index = (selected_item_index + 1) % len(items)
+            elif event.key == pygame.K_RETURN:
+                # Add the selected item to the inventory
+                inventory.append(items[selected_item_index])
+                print(f"Bought {items[selected_item_index]}!")
+    return selected_item_index

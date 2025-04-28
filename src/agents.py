@@ -4,6 +4,7 @@ import os
 import math
 import time
 import random
+from ui import open_store_ui, handle_store_input
 
 root = os.path.dirname(os.path.realpath(__file__))
 with open(os.path.join(root, "data", "dialogue.json"), "r") as file:
@@ -56,7 +57,7 @@ class AGENT:
                             self._trigger_dialogue(game_state)
 
         if self.text_visible:
-            handle_dialogue_input(events, self, game_state)
+            handle_dialogue_input(events, self, game_state, screen )
                 
     def _trigger_dialogue(self, game_state):
         """Trigger dialogue display."""
@@ -131,7 +132,7 @@ def draw_dialogue_box(screen, font, dialogue_text, options, selected_option):
 
 
 
-def handle_dialogue_input(events, agent, game_state):
+def handle_dialogue_input(events, agent, game_state, screen):
     """Handle input for navigating and selecting dialogue options."""
     for event in events:
         if event.type == pygame.KEYDOWN:
@@ -146,16 +147,31 @@ def handle_dialogue_input(events, agent, game_state):
                 except:
                     pass
             elif event.key == pygame.K_RETURN:
-                try:
-                    selected_option = agent.dialogue_options[agent.selected_option]
-                    print(f"Selected option: '{selected_option['text']}', Effect: {selected_option['effect']}")
-                    
-                    # Check if the selected option has a response
-                    if "response" in selected_option and selected_option["response"]:
-                        agent._load_dialogue(selected_option["response"])
-                    else:
-                        agent.text_visible = False
-                        game_state.dialogue_active = False
-                except:
+                selected_option = agent.dialogue_options[agent.selected_option]
+                print(f"Selected option: '{selected_option['text']}', Effect: {selected_option['effect']}")
+
+                # Check if the selected option has an effect
+                if selected_option["effect"] == "open_shop":
+                    # Open the store UI
+                    items = ["itemA", "itemB", "itemB", "itemC"]
+                    selected_item_index = 0
+                    store_open = True
+                    while store_open:
+                        screen.fill((0, 0, 0))  # Clear the screen
+                        open_store_ui(screen, items, selected_item_index)
+                        pygame.display.flip()
+
+                        # Handle store input
+                        events = pygame.event.get()
+                        for event in events:
+                            if event.type == pygame.QUIT:
+                                pygame.quit()
+                                exit()
+                            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                                store_open = False  # Close the store
+                        selected_item_index = handle_store_input(events, items, selected_item_index, game_state.inventory )
+                elif "response" in selected_option and selected_option["response"]:
+                    agent._load_dialogue(selected_option["response"])
+                else:
                     agent.text_visible = False
                     game_state.dialogue_active = False

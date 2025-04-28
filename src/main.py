@@ -1,13 +1,11 @@
 import pygame
 import os
 import argparse
-from world import world_generation
-from world import get_visible_chunks
-from agents import size_human
+from world import world_generation, get_visible_chunks
+from agents import size_human, draw_dialogue_box, handle_dialogue_input
 from ui import draw_ui
 from ui import handle_ui_events
 from game_state import GameState
-from agents import draw_dialogue_box
 
 root = os.path.dirname(os.path.realpath(__file__))
 
@@ -28,6 +26,7 @@ clock = pygame.time.Clock()
 # Global
 game_state = GameState()  # Initialize shared game state
 game_state.debug_mode = args.debug
+game_state.inventory = []
 
 dialogue_active = False
 
@@ -105,6 +104,8 @@ def render(player_pos, events, dt, camera_offset, game_state):
         # Handle interactions with NPCs in the chunk
         for agent in chunk.agents:
             agent.handle_interaction(player_pos, events, screen, font, camera_offset, game_state)
+            if agent.text_visible:
+                handle_dialogue_input(events, agent, game_state, screen)
 
     # Adjust player position based on the camera offset
     player_screen_pos = player_pos - camera_offset
