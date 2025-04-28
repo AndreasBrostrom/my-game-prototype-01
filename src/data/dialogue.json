@@ -1,17 +1,11 @@
 {
-  "generic": {
-    "no_interaction": [
+  "default": {
+    "dialogue": [
       "I have nothing to say to you.",
       "I'm not in the mood for conversation.",
       "Please leave me be.",
       "I don't want to talk right now.",
       "I'm busy, can't you see?"
-    ],
-    "shopkeeper": [
-      "Hello there!",
-      "Welcome to my shop!",
-      "What can I do for you today?",
-      "Good day! How can I assist you?"
     ]
   },
   "beggar": {
@@ -23,7 +17,10 @@
       {
         "option": "Here you go (Give 1 bullet).",
         "effect": "give_bullet_1",
-        "dialogue": "Thank you, kind stranger!"
+        "response": {
+          "dialogue": "Thank you, kind stranger!",
+          "option": "..."
+        }
       },
       {
         "option": "I have nothing to give you.",
@@ -31,6 +28,32 @@
           "I understand, times are tough.",
           "I appreciate your honesty."
         ]
+      }
+    ]
+  },
+  "shopkeeper": {
+    "dialogue": [
+      "Hello there!",
+      "Welcome to my shop!",
+      "What can I do for you today?",
+      "Good day! How can I assist you?"
+    ],
+    "options": [
+      {
+        "option": "I want to buy something.",
+        "effect": "open_shop",
+        "response": {
+          "dialogue": [
+            "Sure! Take a look at my wares.",
+            "Here are the items I have for sale."
+          ]
+        }
+      },
+      {
+        "option": "I am just browsing.",
+        "response": {
+          "dialogue": ["Let me know if you need any help."]
+        }
       }
     ]
   }

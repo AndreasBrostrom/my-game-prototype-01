@@ -13,13 +13,12 @@ with open(os.path.join(root, "data", "dialogue.json"), "r") as file:
 size_human = 12
 
 class AGENT:
-    def __init__(self, position, detection, name: str, profession: str, dialogue: str | bool, allow_dialogue: bool):
+    def __init__(self, position, detection, name: str, profession: str, dialogue: str, game_state):
         self.position = pygame.Vector2(position)
         self.detection = detection
         self.name = name
         self.profession = profession
         self.dialogue = dialogue
-        self.allow_dialogue = allow_dialogue
         self.text_visible = False
         self.text_timer = 0
         self.size = size_human
@@ -58,51 +57,48 @@ class AGENT:
 
         if self.text_visible:
             handle_dialogue_input(events, self, game_state)
-            
+                
     def _trigger_dialogue(self, game_state):
         """Trigger dialogue display."""
         game_state.dialogue_active = True
 
-        if self.allow_dialogue:
-            # Open interactive dialogue
-            if dialogue_table and self.dialogue in dialogue_table:
-                dialogue_data = dialogue_table[self.dialogue]
-                if isinstance(dialogue_data, dict):
-                    # If dialogue_data is a dictionary, handle dialogue and options
-                    dialogue = dialogue_data.get("dialogue", "...")
-                    if isinstance(dialogue, list):
-                        # If "dialogue" is a list, pick a random entry
-                        self.current_dialogue = random.choice(dialogue)
-                    else:
-                        # Otherwise, use the string directly
-                        self.current_dialogue = dialogue
-                    self.dialogue_options = [
-                        {"text": option["option"], "effect": option.get("effect", None)}
-                        for option in dialogue_data.get("options", [])
-                    ]
-                else:
-                    self.current_dialogue = f"{self.name}: Invalid dialogue format."
-                    self.dialogue_options = []
-            else:
-                self.current_dialogue = f"{self.name}: Dialogue not found."
-                self.dialogue_options = []
+        print(dialogue_table, self.dialogue in dialogue_table)
+        if dialogue_table and self.dialogue in dialogue_table:
+            if game_state.debug_mode:
+                print(f"DEBUG: Triggering dialogue for {self.name} ({self.profession})")
+            dialogue_data = dialogue_table[self.dialogue]
+            self._load_dialogue(dialogue_data)
         else:
-            # Show random generic dialogue
-            if dialogue_table and "generic" in dialogue_table:
-                if self.dialogue in dialogue_table["generic"]:
-                    self.current_dialogue = random.choice(dialogue_table["generic"][self.dialogue])
-
-                else:
-                    self.current_dialogue = random.choice(dialogue_table["generic"]["no_interaction"])
-            else:
-                self.current_dialogue = f"{self.name}: ..."
-            default_response = random.choice(["Ok...", "I see...", "Never mined...", "..."])
-            self.dialogue_options = [
-                {"text": default_response, "effect": None}
-            ]
+            if game_state.debug_mode:
+                print(f"DEBUG: No dialogue found for {self.name} ({self.profession})")
+            dialogue_data = dialogue_table["default"]
+            self._load_dialogue(dialogue_data)
 
         self.text_visible = True
         self.text_timer = time.time()
+
+    def _load_dialogue(self, dialogue_data):
+        """Load dialogue and options from the dialogue data."""
+        if isinstance(dialogue_data, dict):
+            # If dialogue_data is a dictionary, handle dialogue and options
+            dialogue = dialogue_data.get("dialogue", "...")
+            if isinstance(dialogue, list):
+                # If "dialogue" is a list, pick a random entry
+                self.current_dialogue = random.choice(dialogue)
+            else:
+                # Otherwise, use the string directly
+                self.current_dialogue = dialogue
+            self.dialogue_options = [
+                {
+                    "text": option["option"],
+                    "effect": option.get("effect", None),
+                    "response": option.get("response", None),
+                }
+                for option in dialogue_data.get("options", [])
+            ]
+        else:
+            self.current_dialogue = f"{self.name}: Invalid dialogue format."
+            self.dialogue_options = []
 
 
 # handle interaction and dialogues        
@@ -134,23 +130,32 @@ def draw_dialogue_box(screen, font, dialogue_text, options, selected_option):
         option_y += 30
 
 
+
 def handle_dialogue_input(events, agent, game_state):
     """Handle input for navigating and selecting dialogue options."""
-    global dialogue_active
-
     for event in events:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                agent.selected_option = (agent.selected_option - 1) % len(agent.dialogue_options)
+                try:
+                    agent.selected_option = (agent.selected_option - 1) % len(agent.dialogue_options)
+                except:
+                    pass
             elif event.key == pygame.K_DOWN:
-                agent.selected_option = (agent.selected_option + 1) % len(agent.dialogue_options)
+                try:
+                    agent.selected_option = (agent.selected_option + 1) % len(agent.dialogue_options)
+                except:
+                    pass
             elif event.key == pygame.K_RETURN:
                 try:
-                    print(agent.selected_option)
                     selected_option = agent.dialogue_options[agent.selected_option]
                     print(f"Selected option: '{selected_option['text']}', Effect: {selected_option['effect']}")
-                    agent.text_visible = False
-                    game_state.dialogue_active = False
+                    
+                    # Check if the selected option has a response
+                    if "response" in selected_option and selected_option["response"]:
+                        agent._load_dialogue(selected_option["response"])
+                    else:
+                        agent.text_visible = False
+                        game_state.dialogue_active = False
                 except:
                     agent.text_visible = False
                     game_state.dialogue_active = False

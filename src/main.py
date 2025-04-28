@@ -26,6 +26,9 @@ screen = pygame.display.set_mode((1920, 1080), flags)
 clock = pygame.time.Clock()
 
 # Global
+game_state = GameState()  # Initialize shared game state
+game_state.debug_mode = args.debug
+
 dialogue_active = False
 
 sprint_timer = 0
@@ -34,7 +37,7 @@ sprint_cooldown = 0
 font = pygame.font.Font(None, 36)
 
 # Load world
-chunks = world_generation()
+chunks = world_generation(game_state)
 def handle_controls(player_pos, dt, chunks, game_state):
     """Handles player movement, sprinting, and collision detection."""
     global sprint_timer, sprint_cooldown
@@ -96,7 +99,7 @@ def render(player_pos, events, dt, camera_offset, game_state):
 
     for chunk in visible_chunks:
         chunk.draw(screen, camera_offset)
-        if args.debug:
+        if game_state.debug_mode:
             chunk.draw_debug_info(screen, camera_offset, font)
 
         # Handle interactions with NPCs in the chunk
@@ -140,7 +143,6 @@ def render(player_pos, events, dt, camera_offset, game_state):
     return player_pos, camera_offset
 
 def main():
-    game_state = GameState()  # Initialize shared game state
     running = True
     dt = 0
     #player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)

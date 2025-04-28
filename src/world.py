@@ -9,7 +9,7 @@ chunk_size = (10, 10)  # Each chunk is 10x10 tiles
 tile_size = (50, 50)  # Each tile is 50x50 pixels
 
 root = os.path.dirname(os.path.abspath(__file__))
-def world_generation():
+def world_generation(game_state):
     with open(os.path.join(root, "data", "world.json"), "r") as file:
         world_chunks_json_data = json.load(file)
 
@@ -31,7 +31,7 @@ def world_generation():
             if agent["chunk_position"] == chunk_data["position"]  # Match chunk position
         ]
 
-        chunks.append(Chunk(chunk_position, chunk_size, chunk_roomIdentifier, tile_size, tile_map, agetns_data))
+        chunks.append(Chunk(chunk_position, chunk_size, chunk_roomIdentifier, tile_size, tile_map, agetns_data, game_state))
     return chunks
 
 def get_visible_chunks(player_position, chunks):
@@ -50,7 +50,7 @@ def get_visible_chunks(player_position, chunks):
     return visible_chunks
 
 class Chunk:
-    def __init__(self, chunk_position, chunk_size, chunk_roomIdentifier, tile_size, tile_map, agents_data):
+    def __init__(self, chunk_position, chunk_size, chunk_roomIdentifier, tile_size, tile_map, agents_data, game_state):
         self.chunk_position = chunk_position  # (x, y) position of the chunk in world space
         self.chunk_size = chunk_size  # (width, height) in tiles
         self.chunk_roomIdentifier = chunk_roomIdentifier  # (width, height) of each tile
@@ -86,9 +86,8 @@ class Chunk:
             name = agent.get("name", "Unknown")
             profession = agent.get("profession", "none")
             dialogue = agent.get("dialogue", False)
-            allow_dialogue = agent.get("allowDialogue", False)
 
-            self.agents.append(AGENT(agent_position, detection, name, profession, dialogue, allow_dialogue))
+            self.agents.append(AGENT(agent_position, detection, name, profession, dialogue, game_state))
 
     def draw(self, screen, camera_offset):
         """Draw all tiles and NPCs in this chunk."""
