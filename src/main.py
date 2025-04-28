@@ -13,12 +13,16 @@ root = os.path.dirname(os.path.realpath(__file__))
 
 parser = argparse.ArgumentParser(description="Adventure Game")
 parser.add_argument('--debug', action='store_true')
+parser.add_argument('--windowed', action='store_true')
 args = parser.parse_args()
 
 # pygame setup
 pygame.init()
 pygame.display.set_caption("Adventure Game")
-screen = pygame.display.set_mode((1920, 1080))
+
+flags = pygame.RESIZABLE if args.windowed else pygame.FULLSCREEN
+screen = pygame.display.set_mode((1920, 1080), flags)
+
 clock = pygame.time.Clock()
 
 # Global
